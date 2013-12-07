@@ -1,17 +1,12 @@
 package com.helion3.tests;
 
-import static org.lwjgl.opengl.ARBBufferObject.*;
-import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.ContextAttribs;
@@ -219,8 +214,77 @@ public class Game {
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 		
-		drawTriangle();
-//		drawVertexBufferObject();
+		drawTextureSquare();
+//		drawCube();
+		
+	}
+	
+	
+	/**
+	 * 
+	 */
+	protected void drawTextureSquare(){
+		
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		float textureDim = 0.0625f;
+		
+		float topLeftX = textureDim * 1;
+		float topLeftY = textureDim * 1;
+		float topRightX = topLeftX + textureDim;
+		float topRightY = topLeftY;
+		float bottomLeftX = topLeftX;
+		float bottomLeftY = topLeftY + textureDim;
+		float bottomRightX = topRightX;
+		float bottomRightY = topRightY + textureDim;
+		
+		// top left
+		triangleTesselator.addVertex(-0.5f, +0.5f, 0f);
+		triangleTesselator.addColor(1, 0, 1);
+		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
+		
+		// bottom left
+		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
+		triangleTesselator.addColor(1, 0, 0);
+		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+		
+		// bottom right
+		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
+		triangleTesselator.addColor(0, 1, 0);
+		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
+
+		// top right
+		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
+		triangleTesselator.addColor(0, 0, 1);
+		triangleTesselator.addTextureCoord(topRightX,topRightY);
+
+		triangleTesselator.render();
+		
+	}
+	
+	
+	/**
+	 * 
+	 */
+	protected void drawSquare(){
+		
+		// top left
+		triangleTesselator.addVertex(-0.5f, +0.5f, 0f);
+		triangleTesselator.addColor(1, 0, 1);
+		
+		// bottom left
+		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
+		triangleTesselator.addColor(1, 0, 0);
+		
+		// bottom right
+		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
+		triangleTesselator.addColor(0, 1, 0);
+
+		// top right
+		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
+		triangleTesselator.addColor(0, 0, 1);
+
+		triangleTesselator.render();
 		
 	}
 	
@@ -230,12 +294,15 @@ public class Game {
 	 */
 	protected void drawTriangle(){
 		
+		// bottom left
 		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
 		triangleTesselator.addColor(1, 0, 0);
 		
+		// bottom right
 		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
 		triangleTesselator.addColor(0, 1, 0);
-		
+
+		// top right
 		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
 		triangleTesselator.addColor(0, 0, 1);
 
@@ -244,54 +311,9 @@ public class Game {
 	}
 	
 	
-	protected void drawVertexBufferObject(){
-		
-	      // create geometry buffers
-	      FloatBuffer cBuffer = BufferUtils.createFloatBuffer(9);
-	      cBuffer.put(1).put(0).put(0);
-	      cBuffer.put(0).put(1).put(0);
-	      cBuffer.put(0).put(0).put(1);
-	      cBuffer.flip();
-
-	      FloatBuffer vBuffer = BufferUtils.createFloatBuffer(9);
-	      vBuffer.put(-0.5f).put(-0.5f).put(0.0f);
-	      vBuffer.put(+0.5f).put(-0.5f).put(0.0f);
-	      vBuffer.put(+0.5f).put(+0.5f).put(0.0f);
-	      vBuffer.flip();
-
-	      //
-
-	      IntBuffer ib = BufferUtils.createIntBuffer(2);
-
-	      glGenBuffersARB(ib);
-	      int vHandle = ib.get(0);
-	      int cHandle = ib.get(1);
-
-	      glEnableClientState(GL_VERTEX_ARRAY);
-	      glEnableClientState(GL_COLOR_ARRAY);
-
-	      glBindBufferARB(GL_ARRAY_BUFFER_ARB, vHandle);
-	      glBufferDataARB(GL_ARRAY_BUFFER_ARB, vBuffer, GL_STATIC_DRAW_ARB);
-	      glVertexPointer(3, GL_FLOAT, 12, 0L);
-
-	      glBindBufferARB(GL_ARRAY_BUFFER_ARB, cHandle);
-	      glBufferDataARB(GL_ARRAY_BUFFER_ARB, cBuffer, GL_STATIC_DRAW_ARB);
-	      glColorPointer(3, GL_FLOAT, 12, 0L);
-
-	      glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	      glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-
-	      glDisableClientState(GL_COLOR_ARRAY);
-	      glDisableClientState(GL_VERTEX_ARRAY);
-
-	      // cleanup VBO handles
-	      ib.put(0, vHandle);
-	      ib.put(1, cHandle);
-	      glDeleteBuffersARB(ib);
-	}
-	
-	
+	/**
+	 * 
+	 */
 	protected void drawCube(){
 		
 		

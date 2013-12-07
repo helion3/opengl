@@ -8,14 +8,13 @@ import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.ARBBufferObject.*;
 import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
-//import static org.lwjgl.opengl.GL15.*;
 
 public class TriangleTesselator {
 	
-	private static int bufferSize = 18;
+	private static int bufferSize = 36;
 	
 	private FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
-	private IntBuffer ib = BufferUtils.createIntBuffer(2);
+	private IntBuffer ib = BufferUtils.createIntBuffer(1);
     protected int vertexCount = 0;
     
     
@@ -41,10 +40,21 @@ public class TriangleTesselator {
     public void addColor( float r, float g, float b ){
     	interleavedBuffer.put(r).put(g).put(b);
     }
-
+    
     
     /**
      * 
+     * @param x
+     * @param y
+     */
+    public void addTextureCoord( float x, float y ){
+    	interleavedBuffer.put(x).put(y);
+    }
+
+    
+    /**
+     * The stride is how much space is between two tuples - 3 vertex floats, 3 color floats, 2 texture coords = 8. 8 x 4 = 32
+     * the offset is how much space is between 0 and the first appearance of the first tuple. 3 vertex floats before 1st color. 3 x 4 = 12
      */
     public void render(){
     	
@@ -55,24 +65,23 @@ public class TriangleTesselator {
         
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vHandle);
         glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
         
-        /* Stride = float positions before the next instance of the same parameter. (3 vertex, 3 color = 6 multiply by 4 for bytes per float */
-        /* Offset = how many floats come before instance of color (etc) float multiplied by size of float */
-        
-        glVertexPointer(3, GL_FLOAT, 24, 0); // float at index 0
-        glColorPointer(3, GL_FLOAT, 24, 12); // float at index 3 (* 4 bytes)
+        glVertexPointer(3, GL_FLOAT, 32, 0);
+        glColorPointer(3, GL_FLOAT, 32, 12);
+        glTexCoordPointer(3, GL_FLOAT, 32, 24);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        // cleanup VBO handles
         ib.put(0, vHandle);
         glDeleteBuffersARB(ib);
         
