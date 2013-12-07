@@ -1,6 +1,10 @@
-package com.helion3.tests;
+package com.helion3.opengl.shapes;
+
+import com.helion3.opengl.rendering.QuadRenderer;
 
 public class ColorSquare {
+	
+	private static QuadRenderer quadTesselator = new QuadRenderer();
 	
 	
 	/**
@@ -10,7 +14,7 @@ public class ColorSquare {
 	 * @param y
 	 * @param z
 	 */
-	public static void draw( QuadTesselator quadTesselator, int x, int y, int z ){
+	public static void draw( int x, int y, int z ){
 		
 		float size = 5f;
 		

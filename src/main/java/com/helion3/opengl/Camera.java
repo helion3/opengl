@@ -1,4 +1,4 @@
-package com.helion3.tests;
+package com.helion3.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -8,6 +8,7 @@ public class Camera {
 	private float pitch = 0;
 	private float yaw = 0;
 	private Vector3f position = new Vector3f(0,0,0);
+	private float speed = 0.5f;
 	
 	
 	/**
@@ -70,8 +71,8 @@ public class Camera {
      * 
      */
     public void moveLeft(){
-    	position.x += 0.1f * getXPos(yaw- 90);
-		position.z += 0.1f * getZPos(yaw- 90);
+    	position.x += 0.1f * getXPos(yaw-90);
+		position.z += 0.1f * getZPos(yaw-90);
     }
     
     
@@ -79,8 +80,8 @@ public class Camera {
      * 
      */
     public void moveRight(){
-    	position.x -= 0.1f * getXPos(yaw-90);
-		position.z -= 0.1f * getZPos(yaw-90);
+    	position.x -= 0.15f * getXPos(yaw-90);
+		position.z -= 0.15f * getZPos(yaw-90);
     }
     
     
@@ -88,8 +89,8 @@ public class Camera {
      * 
      */
     public void moveForward(){
-    	position.x -= (float) getXPos(yaw) * (0.15f);
-		position.z -= (float) getZPos(yaw) * (0.15f);
+    	position.x -= (float) getXPos(yaw) * speed;
+		position.z -= (float) getZPos(yaw) * speed;
     }
     
     
@@ -97,8 +98,8 @@ public class Camera {
      * 
      */
     public void moveBackward(){
-    	position.x += (float) getXPos(yaw) * (0.15f);
-		position.z += (float) getZPos(yaw) * (0.15f);
+    	position.x += (float) getXPos(yaw) * speed;
+		position.z += (float) getZPos(yaw) * speed;
     }
     
     
@@ -106,7 +107,7 @@ public class Camera {
      * 
      */
     public void moveUp(){
-    	position.y += 1;
+    	position.y += speed;
     }
     
     
@@ -114,7 +115,7 @@ public class Camera {
      * 
      */
     public void moveDown(){
-    	position.y -= 1;
+    	position.y -= speed;
     }
 
     

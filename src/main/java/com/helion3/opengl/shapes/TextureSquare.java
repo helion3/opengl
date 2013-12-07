@@ -1,12 +1,16 @@
-package com.helion3.tests;
+package com.helion3.opengl.shapes;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
 import org.newdawn.slick.opengl.Texture;
 
+import com.helion3.opengl.rendering.TextureQuadRenderer;
+
 
 public class TextureSquare {
+	
+	private static TextureQuadRenderer quadTesselator = new TextureQuadRenderer();
 	
 	
 	/**
@@ -16,7 +20,7 @@ public class TextureSquare {
 	 * @param y
 	 * @param z
 	 */
-	public static void draw( TextureQuadTesselator quadTesselator, Texture texture, int x, int y, int z ){
+	public static void draw( Texture texture, int x, int y, int z ){
 		
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);

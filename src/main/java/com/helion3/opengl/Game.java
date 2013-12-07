@@ -1,4 +1,4 @@
-package com.helion3.tests;
+package com.helion3.opengl;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -16,6 +16,8 @@ import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
+
+import com.helion3.opengl.shapes.*;
 
 
 public class Game {
@@ -47,11 +49,6 @@ public class Game {
 	private int fps;	
 	private long lastFPS;
 	private Camera camera = new Camera();
-//	private Tesselator tesselator = new Tesselator();
-	private TriangleTesselator triangleTesselator = new TriangleTesselator();
-	private QuadTesselator quadTesselator = new QuadTesselator();
-	private CubeTesselator cubeTesselator = new CubeTesselator();
-	private TextureQuadTesselator textureQuadTesselator = new TextureQuadTesselator();
 	private Texture texture;
 	private float mouseSensitivity = 0.1f;
 	
@@ -223,70 +220,56 @@ public class Game {
 
 		camera.lookThrough();
 		
-//		drawTextureSquare();
-//		drawSquareViaTriangles();
-//		ColorSquare.draw( quadTesselator, 20, 1, 20 );
-//		TextureSquare.draw(textureQuadTesselator, texture, 20, 1, 20);
-		TextureCube.draw(textureQuadTesselator, texture, 20, 1, 20);
-
+//		Triangle.draw();
+//		ColorSquare.draw( 20, 1, 20 );
+//		TextureSquare.draw( texture, 20, 1, 20 );
+//		TextureCube.draw( texture, 20, 1, 20 );
 		
+		for( int x = 0; x < 16; x++ ){
+			for( int z = 0; z < 16; z++ ){
+				for( int y = 0; y < 5; y++ ){
+					TextureCube.draw( texture, x, y, z );
+				}
+			}
+		}
 	}
 	
 	
-	/**
-	 * 
-	 */
-	protected void drawSquareViaTriangles(){
-		
-		// triangle A
-		
-		// top left
-		triangleTesselator.addVertex(20, 40, 0f);
-		triangleTesselator.addColor(1, 0, 1);
-		
-		// bottom left
-		triangleTesselator.addVertex(20, 20, 0f);
-		triangleTesselator.addColor(1, 0, 0);
-		
-		// bottom right
-		triangleTesselator.addVertex(40, 20, 0f);
-		triangleTesselator.addColor(0, 1, 0);
-
-		
-		// Triangle B
-		
-		// top left
-		triangleTesselator.addVertex(20, 40, 0f);
-		triangleTesselator.addColor(1, 0, 1);
-
-		// top right
-		triangleTesselator.addVertex(40, 40, 0f);
-		triangleTesselator.addColor(0, 0, 1);
-		
-		// bottom right
-		triangleTesselator.addVertex(40, 20, 0f);
-		triangleTesselator.addColor(0, 1, 0);
-	
-		triangleTesselator.render();
-		
-	}
-	
-	
-	/**
-	 * 
-	 */
-	protected void drawTriangle(){
-		
-		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
-		triangleTesselator.addColor(1, 0, 0);
-		
-		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
-		triangleTesselator.addColor(0, 1, 0);
-		
-		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
-		triangleTesselator.addColor(0, 0, 1);
-
-		triangleTesselator.render();
-		
-	}
+//	/**
+//	 * 
+//	 */
+//	protected void drawSquareViaTriangles(){
+//		
+//		// triangle A
+//		
+//		// top left
+//		triangleTesselator.addVertex(20, 40, 0f);
+//		triangleTesselator.addColor(1, 0, 1);
+//		
+//		// bottom left
+//		triangleTesselator.addVertex(20, 20, 0f);
+//		triangleTesselator.addColor(1, 0, 0);
+//		
+//		// bottom right
+//		triangleTesselator.addVertex(40, 20, 0f);
+//		triangleTesselator.addColor(0, 1, 0);
+//
+//		
+//		// Triangle B
+//		
+//		// top left
+//		triangleTesselator.addVertex(20, 40, 0f);
+//		triangleTesselator.addColor(1, 0, 1);
+//
+//		// top right
+//		triangleTesselator.addVertex(40, 40, 0f);
+//		triangleTesselator.addColor(0, 0, 1);
+//		
+//		// bottom right
+//		triangleTesselator.addVertex(40, 20, 0f);
+//		triangleTesselator.addColor(0, 1, 0);
+//	
+//		triangleTesselator.render();
+//		
+//	}
 }

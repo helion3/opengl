@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.helion3</groupId>
-  <artifactId>tests</artifactId>
+  <artifactId>opengl</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>OpenGLTest</name>
   <description>OpenGL experiments</description>
@@ -36,7 +36,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.helion3.tests.Launcher</mainClass>
+                            <mainClass>com.helion3.opengl.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

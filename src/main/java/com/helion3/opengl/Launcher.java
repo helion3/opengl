@@ -1,4 +1,4 @@
-package com.helion3.tests;
+package com.helion3.opengl;
 
 public class Launcher {
 	

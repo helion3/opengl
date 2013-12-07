@@ -1,4 +1,4 @@
-package com.helion3.tests;
+package com.helion3.opengl.rendering;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -8,14 +8,13 @@ import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.ARBBufferObject.*;
 import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
-//import static org.lwjgl.opengl.GL15.*;
 
-public class Tesselator {
+public class QuadRenderer {
 	
-	private static int bufferSize = 16*16*128 * 9 * 2; // chunk size * vertex/color/texture size (adding * 2 for now so I have room, real size unknown)
+	private static int bufferSize = 192; // extra room
 	
 	private FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
-	private IntBuffer ib = BufferUtils.createIntBuffer(2);
+	private IntBuffer ib = BufferUtils.createIntBuffer(1);
     protected int vertexCount = 0;
     
     
@@ -41,24 +40,13 @@ public class Tesselator {
     public void addColor( float r, float g, float b ){
     	interleavedBuffer.put(r).put(g).put(b);
     }
-    
-    
-    /**
-     * 
-     * @param x
-     * @param y
-     */
-    public void addTextureCoord( float x, float y ){
-    	interleavedBuffer.put(x).put(y);
-    }
-    
+
     
     /**
-     * 
+     * The stride is how much space is between two tuples - 3 vertex floats, 3 color floats = 6. 6 x 4 = 24
+     * the offset is how much space is between 0 and the first appearance of the first tuple. 3 vertex floats before 1st color. 3 x 4 = 12
      */
     public void render(){
-    	
-    	System.out.println("Rendering...");
     	
     	interleavedBuffer.flip();
 
@@ -67,28 +55,20 @@ public class Tesselator {
         
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vHandle);
         glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
         
-        /* Stride = float positions before the next instance of the same parameter. (3 vertex, 3 color, 2 texture coords  8 multiply by 4 for bytes per float */
-        /* Offset = which index offset the right values begin */
-        
-        glVertexPointer(3, GL_FLOAT, 38, 0); // float at index 0
-        glColorPointer(3, GL_FLOAT, 38, 12); // float at index 3 (* 4 bytes)
-        glTexCoordPointer(2, GL_FLOAT, 38, 24); // float at index 6 (* 4 bytes)
+        glVertexPointer(3, GL_FLOAT, 24, 0);
+        glColorPointer(3, GL_FLOAT, 24, 12);
 
-        //If you are not using IBOs:
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        glDrawArrays(GL_QUADS, 0, vertexCount);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        // cleanup VBO handles
         ib.put(0, vHandle);
         glDeleteBuffersARB(ib);
         

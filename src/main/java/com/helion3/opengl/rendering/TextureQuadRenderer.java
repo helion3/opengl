@@ -1,4 +1,4 @@
-package com.helion3.tests;
+package com.helion3.opengl.rendering;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.ARBBufferObject.*;
 import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class TextureQuadTesselator {
+public class TextureQuadRenderer {
 	
 	private static int bufferSize = 192; // extra room
 	
