@@ -1,7 +1,6 @@
 package com.helion3.tests;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 
 import java.io.IOException;
 
@@ -12,8 +11,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.opengl.Texture;
@@ -54,6 +51,7 @@ public class Game {
 	private TriangleTesselator triangleTesselator = new TriangleTesselator();
 	private QuadTesselator quadTesselator = new QuadTesselator();
 	private CubeTesselator cubeTesselator = new CubeTesselator();
+	private TextureQuadTesselator textureQuadTesselator = new TextureQuadTesselator();
 	private Texture texture;
 	private float mouseSensitivity = 0.1f;
 	
@@ -227,68 +225,9 @@ public class Game {
 		
 //		drawTextureSquare();
 //		drawSquareViaTriangles();
-		ColorSquare.draw( quadTesselator, 20, 1, 20 );
-
-		
-	}
-	
-	
-	/**
-	 * 
-	 */
-	protected void drawTextureSquare(){
-		
-//		glEnable(GL11.GL_TEXTURE_2D);
-//		glEnable(GL11.GL_DEPTH_TEST);
-//		glDepthFunc(GL11.GL_LEQUAL);
-//		
-//		texture.bind();
-//		GL13.glActiveTexture(GL_TEXTURE0 + 0);
-
-		Cube.draw(quadTesselator, 20, 1, 20);
-		quadTesselator.render();
-//		Cube.draw(cubeTesselator, 1, 2, 1);
-//		cubeTesselator.render();
-
-//		// top left
-//		triangleTesselator.addVertex(20, 40, 10);
-////		triangleTesselator.addColor(1, 0, 1);
-//		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
-//		
-//		// bottom left
-//		triangleTesselator.addVertex(20, 20, 10);
-////		triangleTesselator.addColor(1, 0, 0);
-//		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-//		
-//		// bottom right
-//		triangleTesselator.addVertex(40, 20, 10);
-////		triangleTesselator.addColor(0, 1, 0);
-//		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
-//
-//		// top right
-//		triangleTesselator.addVertex(40, 40, 10);
-////		triangleTesselator.addColor(0, 0, 1);
-//		triangleTesselator.addTextureCoord(topRightX,topRightY);
-		
-//		// top left
-//		triangleTesselator.addVertex(-0.5f, +0.5f, 10);
-//		triangleTesselator.addColor(1, 0, 1);
-//		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
-//		
-//		// bottom left
-//		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
-//		triangleTesselator.addColor(1, 0, 0);
-//		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-//		
-//		// bottom right
-//		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
-//		triangleTesselator.addColor(0, 1, 0);
-//		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
-//
-//		// top right
-//		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
-//		triangleTesselator.addColor(0, 0, 1);
-//		triangleTesselator.addTextureCoord(topRightX,topRightY);
+//		ColorSquare.draw( quadTesselator, 20, 1, 20 );
+//		TextureSquare.draw(textureQuadTesselator, texture, 20, 1, 20);
+		TextureCube.draw(textureQuadTesselator, texture, 20, 1, 20);
 
 		
 	}
