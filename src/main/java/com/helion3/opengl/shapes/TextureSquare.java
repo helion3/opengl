@@ -10,7 +10,7 @@ import com.helion3.opengl.rendering.TextureQuadRenderer;
 
 public class TextureSquare {
 	
-	private static TextureQuadRenderer quadTesselator = new TextureQuadRenderer();
+	private static TextureQuadRenderer quadTesselator = new TextureQuadRenderer(192);
 	
 	
 	/**

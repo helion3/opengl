@@ -11,11 +11,18 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class TextureQuadRenderer {
 	
-	private static int bufferSize = 192; // extra room
-	
-	private FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
+	private FloatBuffer interleavedBuffer;
 	private IntBuffer ib = BufferUtils.createIntBuffer(1);
     protected int vertexCount = 0;
+    
+    
+    /**
+     * 
+     * @param bufferSize
+     */
+    public TextureQuadRenderer( int bufferSize ){
+    	this.interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
+    }
     
     
     /**

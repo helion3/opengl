@@ -123,7 +123,6 @@ public class Game {
 		
 		glClearColor(0.1f, 0.4f, 0.6f, 0.0f);
 		glClearDepth(1.0f);
-//		glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
 		
 		try {
 			texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("images/terrain.png"));
@@ -225,14 +224,15 @@ public class Game {
 //		TextureSquare.draw( texture, 20, 1, 20 );
 //		TextureCube.draw( texture, 20, 1, 20 );
 		
-		for( int x = 0; x < 16; x++ ){
-			for( int z = 0; z < 16; z++ ){
-				for( int y = 0; y < 5; y++ ){
-					TextureCube.draw( texture, x, y, z );
-				}
+		// Draw several chunks of blocks
+		for( int x = 1; x < 10; x++ ){
+			for( int z = 1; z < 10; z++ ){
+				Chunk.draw(texture, x, z);
 			}
 		}
 	}
+	
+
 	
 	
 //	/**
