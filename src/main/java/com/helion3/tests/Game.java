@@ -4,17 +4,18 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 
 import java.io.IOException;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -37,9 +38,7 @@ public class Game {
     /**
 	 * Public static
 	 */
-    public static final String name = "Entropy";
-	public static final Logger log = Logger.getLogger(name);
-	public static final Properties prop = new Properties();
+    public static final String name = "OpenGL Tests";
 	public static final short GAME_WIDTH = 1024;
 	public static final short GAME_HEIGHT = 768;
 	public static int delta;
@@ -50,9 +49,14 @@ public class Game {
 	private long lastFrame;			
 	private int fps;	
 	private long lastFPS;
-	private Tesselator tesselator = new Tesselator();
+	private Camera camera = new Camera();
+//	private Tesselator tesselator = new Tesselator();
 	private TriangleTesselator triangleTesselator = new TriangleTesselator();
+	private QuadTesselator quadTesselator = new QuadTesselator();
+	private CubeTesselator cubeTesselator = new CubeTesselator();
 	private Texture texture;
+	private float mouseSensitivity = 0.1f;
+	
 	    	
 	/**
 	 * 
@@ -69,15 +73,17 @@ public class Game {
 		
 		// Init display
 		Display.setResizable(true);
-        Display.setTitle( Game.name );
-        Display.setVSyncEnabled(true);
-        Display.setDisplayMode(new DisplayMode(Game.GAME_WIDTH, Game.GAME_HEIGHT));
-        
-        // Set viewport
-        PixelFormat pixelFormat = new PixelFormat();
+		Display.setTitle( Game.name );
+		Display.setVSyncEnabled(true);
+		Display.setDisplayMode(new DisplayMode(Game.GAME_WIDTH, Game.GAME_HEIGHT));
+		
+		// Set viewport
+		PixelFormat pixelFormat = new PixelFormat();
 		ContextAttribs contextAtrributes = new ContextAttribs(3, 0);
 		Display.create(pixelFormat, contextAtrributes);
 		glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
+		
+		MouseHelper.grab();
 		
         initGL();
         getDelta();
@@ -93,7 +99,7 @@ public class Game {
 	 * 
 	 */
 	protected void displayLoop(){
-		while (!Display.isCloseRequested()){
+		while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 			if (Display.wasResized()) {
 				initGL();
 			}
@@ -112,38 +118,18 @@ public class Game {
 	 */
 	protected void initGL(){
 		
-		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		
+		glViewport(0, 0, Display.getWidth(), Display.getHeight());
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		
+		GLU.gluPerspective(60f, ((float) Display.getWidth() / (float) Display.getHeight()), 0.1f, 200.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-
-//		int width = Display.getDisplayMode().getWidth(); // Get window width
-//		int height = Display.getDisplayMode().getHeight(); // Get window height
-//
-//		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
-//		GL11.glMatrixMode(GL11.GL_PROJECTION); // Select The Projection Matrix
-//		GL11.glLoadIdentity(); // Reset The Projection Matrix
-//		//60.0f is the Field of Vision
-//		
-//		GLU.gluPerspective(60f, ((float) width / (float) height), 0.1f, 200.0f); // Calculate The Aspect Ratio Of The Window
-//		GL11.glMatrixMode(GL11.GL_MODELVIEW); // Select The Modelview Matrix
-//		GL11.glLoadIdentity(); // Reset The Modelview Matrix
-//
-//		GL11.glEnable(GL11.GL_TEXTURE_2D); // Enable Texture Mapping 
-//		GL11.glClearColor(0.1f, 0.4f, 0.6f, 0.0f); // Background R G B A
-//		GL11.glClearDepth(1.0f); // Depth Buffer Setup
-//		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-//		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
-//		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST); // Really Nice Perspective Calculations
-//		
-////		//Cull faces - Only draw the front face
-////		GL11.glCullFace(GL11.GL_BACK);
-////		GL11.glEnable(GL11.GL_CULL_FACE);
-//		
+		
+		glClearColor(0.1f, 0.4f, 0.6f, 0.0f);
+		glClearDepth(1.0f);
+//		glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+		
 		try {
 			texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("images/terrain.png"));
 			texture.bind();
@@ -202,6 +188,29 @@ public class Game {
 	protected void update(){
 		
 		updateFPS();
+		
+		camera.yaw(Mouse.getDX() * mouseSensitivity);
+		camera.pitch(Mouse.getDY() * mouseSensitivity);
+		
+		// Player movement
+		if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D)){
+			camera.moveRight();
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A)){
+			camera.moveLeft();
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W)){
+			camera.moveForward();
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S)){
+			camera.moveBackward();
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
+			camera.moveUp();
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_C)){
+			camera.moveDown();
+		}
 
 	}
 	
@@ -210,12 +219,16 @@ public class Game {
 	 * Render
 	 * @todo move to screens
 	 */
-	private void render() {
+	private void render(){
 		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		camera.lookThrough();
 		
-		drawTextureSquare();
-//		drawCube();
+//		drawTextureSquare();
+//		drawSquareViaTriangles();
+		ColorSquare.draw( quadTesselator, 20, 1, 20 );
+
 		
 	}
 	
@@ -225,40 +238,58 @@ public class Game {
 	 */
 	protected void drawTextureSquare(){
 		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
-		float textureDim = 0.0625f;
-		
-		float topLeftX = textureDim * 1;
-		float topLeftY = textureDim * 1;
-		float topRightX = topLeftX + textureDim;
-		float topRightY = topLeftY;
-		float bottomLeftX = topLeftX;
-		float bottomLeftY = topLeftY + textureDim;
-		float bottomRightX = topRightX;
-		float bottomRightY = topRightY + textureDim;
-		
-		// top left
-		triangleTesselator.addVertex(-0.5f, +0.5f, 0f);
-		triangleTesselator.addColor(1, 0, 1);
-		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
-		
-		// bottom left
-		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
-		triangleTesselator.addColor(1, 0, 0);
-		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
-		triangleTesselator.addColor(0, 1, 0);
-		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
+//		glEnable(GL11.GL_TEXTURE_2D);
+//		glEnable(GL11.GL_DEPTH_TEST);
+//		glDepthFunc(GL11.GL_LEQUAL);
+//		
+//		texture.bind();
+//		GL13.glActiveTexture(GL_TEXTURE0 + 0);
 
-		// top right
-		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
-		triangleTesselator.addColor(0, 0, 1);
-		triangleTesselator.addTextureCoord(topRightX,topRightY);
+		Cube.draw(quadTesselator, 20, 1, 20);
+		quadTesselator.render();
+//		Cube.draw(cubeTesselator, 1, 2, 1);
+//		cubeTesselator.render();
 
-		triangleTesselator.render();
+//		// top left
+//		triangleTesselator.addVertex(20, 40, 10);
+////		triangleTesselator.addColor(1, 0, 1);
+//		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
+//		
+//		// bottom left
+//		triangleTesselator.addVertex(20, 20, 10);
+////		triangleTesselator.addColor(1, 0, 0);
+//		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+//		
+//		// bottom right
+//		triangleTesselator.addVertex(40, 20, 10);
+////		triangleTesselator.addColor(0, 1, 0);
+//		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
+//
+//		// top right
+//		triangleTesselator.addVertex(40, 40, 10);
+////		triangleTesselator.addColor(0, 0, 1);
+//		triangleTesselator.addTextureCoord(topRightX,topRightY);
+		
+//		// top left
+//		triangleTesselator.addVertex(-0.5f, +0.5f, 10);
+//		triangleTesselator.addColor(1, 0, 1);
+//		triangleTesselator.addTextureCoord(topLeftX,topLeftY);
+//		
+//		// bottom left
+//		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
+//		triangleTesselator.addColor(1, 0, 0);
+//		triangleTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+//		
+//		// bottom right
+//		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
+//		triangleTesselator.addColor(0, 1, 0);
+//		triangleTesselator.addTextureCoord(bottomRightX,bottomRightY);
+//
+//		// top right
+//		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
+//		triangleTesselator.addColor(0, 0, 1);
+//		triangleTesselator.addTextureCoord(topRightX,topRightY);
+
 		
 	}
 	
@@ -266,24 +297,37 @@ public class Game {
 	/**
 	 * 
 	 */
-	protected void drawSquare(){
+	protected void drawSquareViaTriangles(){
+		
+		// triangle A
 		
 		// top left
-		triangleTesselator.addVertex(-0.5f, +0.5f, 0f);
+		triangleTesselator.addVertex(20, 40, 0f);
 		triangleTesselator.addColor(1, 0, 1);
 		
 		// bottom left
-		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
+		triangleTesselator.addVertex(20, 20, 0f);
 		triangleTesselator.addColor(1, 0, 0);
 		
 		// bottom right
-		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
+		triangleTesselator.addVertex(40, 20, 0f);
 		triangleTesselator.addColor(0, 1, 0);
 
-		// top right
-		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
-		triangleTesselator.addColor(0, 0, 1);
+		
+		// Triangle B
+		
+		// top left
+		triangleTesselator.addVertex(20, 40, 0f);
+		triangleTesselator.addColor(1, 0, 1);
 
+		// top right
+		triangleTesselator.addVertex(40, 40, 0f);
+		triangleTesselator.addColor(0, 0, 1);
+		
+		// bottom right
+		triangleTesselator.addVertex(40, 20, 0f);
+		triangleTesselator.addColor(0, 1, 0);
+	
 		triangleTesselator.render();
 		
 	}
@@ -294,80 +338,16 @@ public class Game {
 	 */
 	protected void drawTriangle(){
 		
-		// bottom left
 		triangleTesselator.addVertex(-0.5f, -0.5f, 0f);
 		triangleTesselator.addColor(1, 0, 0);
 		
-		// bottom right
 		triangleTesselator.addVertex(+0.5f, -0.5f, 0f);
 		triangleTesselator.addColor(0, 1, 0);
-
-		// top right
+		
 		triangleTesselator.addVertex(+0.5f, +0.5f, 0f);
 		triangleTesselator.addColor(0, 0, 1);
 
 		triangleTesselator.render();
 		
-	}
-	
-	
-	/**
-	 * 
-	 */
-	protected void drawCube(){
-		
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D); // Enable Texture Mapping 
-		texture.bind();
-		GL13.glActiveTexture(GL_TEXTURE0 + 0);
-//		glEnable(GL11.GL_CULL_FACE);
-		
-		float textureDim = 0.0625f;
-		
-		float topLeftX = textureDim * 1;
-		float topLeftY = textureDim * 1;
-		float topRightX = topLeftX + textureDim;
-		float topRightY = topLeftY;
-		float bottomLeftX = topLeftX;
-		float bottomLeftY = topLeftY + textureDim;
-		float bottomRightX = topRightX;
-		float bottomRightY = topRightY + textureDim;
-		float vertexOffset = 0.5f;
-		
-		// north
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		tesselator.addVertex(-(vertexOffset),-(vertexOffset),+(vertexOffset));
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(bottomRightX,bottomRightY);
-		tesselator.addVertex(+(vertexOffset),-(vertexOffset),+(vertexOffset));
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(topRightX,topRightY);
-		tesselator.addVertex(+(vertexOffset),+(vertexOffset),+(vertexOffset));
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(topLeftX,topLeftY);
-		tesselator.addVertex(-(vertexOffset),+(vertexOffset),+(vertexOffset));
-		
-		// east
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		tesselator.addVertex(-(vertexOffset),-(vertexOffset),-(vertexOffset) );
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(bottomRightX,bottomRightY);
-		tesselator.addVertex(-(vertexOffset),-(vertexOffset),+(vertexOffset));
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(topRightX,topRightY);
-		tesselator.addVertex(-(vertexOffset),+(vertexOffset),+(vertexOffset));
-		
-		tesselator.addColor(1f, 1f, 1f);
-		tesselator.addTextureCoord(topLeftX,topLeftY);
-		tesselator.addVertex(-(vertexOffset),+(vertexOffset),-(vertexOffset) );
-		
-		tesselator.render();
 	}
 }

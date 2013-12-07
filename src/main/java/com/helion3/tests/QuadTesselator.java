@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.ARBBufferObject.*;
 import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class TriangleTesselator {
+public class QuadTesselator {
 	
 	private static int bufferSize = 192; // extra room
 	
@@ -62,7 +62,7 @@ public class TriangleTesselator {
         glVertexPointer(3, GL_FLOAT, 24, 0);
         glColorPointer(3, GL_FLOAT, 24, 12);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
+        glDrawArrays(GL_QUADS, 0, vertexCount);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 

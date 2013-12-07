@@ -9,9 +9,9 @@ import static org.lwjgl.opengl.ARBBufferObject.*;
 import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
-public class TriangleTesselator {
+public class CubeTesselator {
 	
-	private static int bufferSize = 192; // extra room
+	private static int bufferSize = 192; // 6 faces x 96 (8 floats per vertex, 4 per face) 
 	
 	private FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
 	private IntBuffer ib = BufferUtils.createIntBuffer(1);
@@ -40,10 +40,20 @@ public class TriangleTesselator {
     public void addColor( float r, float g, float b ){
     	interleavedBuffer.put(r).put(g).put(b);
     }
+    
+    
+    /**
+     * 
+     * @param x
+     * @param y
+     */
+    public void addTextureCoord( float x, float y ){
+    	interleavedBuffer.put(x).put(y);
+    }
 
     
     /**
-     * The stride is how much space is between two tuples - 3 vertex floats, 3 color floats = 6. 6 x 4 = 24
+     * The stride is how much space is between two tuples - 3 vertex floats, 3 color floats, 2 texture coords = 8. 8 x 4 = 32
      * the offset is how much space is between 0 and the first appearance of the first tuple. 3 vertex floats before 1st color. 3 x 4 = 12
      */
     public void render(){
@@ -55,19 +65,22 @@ public class TriangleTesselator {
         
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vHandle);
         glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
         
-        glVertexPointer(3, GL_FLOAT, 24, 0);
-        glColorPointer(3, GL_FLOAT, 24, 12);
+        glColorPointer(3, GL_FLOAT, 32, 0);
+        glTexCoordPointer(3, GL_FLOAT, 32, 12);
+        glVertexPointer(3, GL_FLOAT, 32, 24);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
+        glDrawArrays(GL_QUADS, 0, vertexCount);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
         ib.put(0, vHandle);
         glDeleteBuffersARB(ib);
