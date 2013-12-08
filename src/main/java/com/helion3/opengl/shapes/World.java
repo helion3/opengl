@@ -13,8 +13,8 @@ public class World {
 	 */
 	public World(){
 		// Build all of the initial chunks
-		for( int x = 1; x < 10; x++ ){
-			for( int z = 1; z < 10; z++ ){
+		for( int x = 1; x < 15; x++ ){
+			for( int z = 1; z < 16; z++ ){
 				Chunk c = new Chunk(x, z);
 				c.prerender();
 				loadedChunks.add( c );
