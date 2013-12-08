@@ -12,14 +12,28 @@ public class Chunk {
 	private int bufferSize = 192 * ROWS * COLUMNS * HEIGHT; // 192 per block * chunk dimensions
 	private TextureQuadRenderer quadTesselator = new TextureQuadRenderer(bufferSize);
 	
+	private byte[][][] blocks = new byte[ROWS][COLUMNS][HEIGHT];
+	private int chunkX;
+	private int chunkZ;
+	
+	
+	/**
+	 * 
+	 * @param chunkX
+	 * @param chunkZ
+	 */
+	public Chunk( int chunkX, int chunkZ ){
+		this.chunkX = chunkX;
+		this.chunkZ = chunkZ;
+	}
+	
 
 	/**
 	 * Build the tileset for this chunk
 	 * @param chunkX
 	 * @param chunkZ
 	 */
-	public int prerender( int chunkX, int chunkZ ){
-		int blocksRendered = 0;
+	public void prerender(){
 		for( int x = 0; x < ROWS; x++ ){
 			for( int z = 0; z < COLUMNS; z++ ){
 				for( int y = 0; y < HEIGHT; y++ ){
@@ -27,14 +41,13 @@ public class Chunk {
 					// Only render blocks on the edges, saves a bit of work in checking neighbor blocks
 					// in a real app with random terrain, this won't cut it.
 					if( x == 0 || z == 0 || y == 0 || x == (ROWS-1) || y == (HEIGHT-1) || z == (COLUMNS-1) ){
-						blocksRendered++;
-						prerenderBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
+						blocks[x][z][y] = 1;
+						prerenderBlock( x, y, z );
 					}
 				}
 			}
 		}
 		quadTesselator.saveToBuffer();
-		return blocksRendered;
 	}
 	
 	
@@ -68,137 +81,161 @@ public class Chunk {
 		float bottomRightX = topRightX;
 		float bottomRightY = topRightY + textureDim;
 		
+		float realX = (chunkX*ROWS)+x;
+		float realZ = (chunkZ*COLUMNS)+z;
+		
 		// NORTH FACE
+		if (z < Chunk.COLUMNS ) {
+			if (z != 0 && (z == Chunk.COLUMNS - 1) || (blocks[x][y][z + 1] != 1)){
 		
-		// bottom left
-		quadTesselator.addVertex(-(size)+x, -(size)+y, size+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(size+x, -(size)+y, size+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(size+x, size+y, size+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(-(size)+x, size+y, size+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
+				// bottom left
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(size+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(size+realX, size+y, size+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(-(size)+realX, size+y, size+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+				
+			}
+		}
 		
 		// SOUTH FACE
+		if (z >= 0) {
+			if (z != Chunk.COLUMNS - 1 && (z == 0) || (blocks[x][y][z - 1] != 1)){
 		
-		// bottom left
-		quadTesselator.addVertex(size+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(-(size)+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(-(size)+x, size+y, -(size)+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(size+x, size+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
+				// bottom left
+				quadTesselator.addVertex(size+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(-(size)+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(size+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+			}
+		}
 		
 		// WEST FACE
-		
-		// bottom left
-		quadTesselator.addVertex(size+x, -(size)+y, size+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(size+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(size+x, size+y, -(size)+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(size+x, size+y, size+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
-		
+		if (x < Chunk.ROWS) {
+			if (x != 0 && (x == Chunk.ROWS - 1) || (blocks[x + 1][y][z] != 1)){
+				// bottom left
+				quadTesselator.addVertex(size+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(size+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(size+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(size+realX, size+y, size+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+			}
+		}
+			
 		// EAST FACE
-		
-		// bottom left
-		quadTesselator.addVertex(-(size)+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(-(size)+x, -(size)+y, size+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(-(size)+x, size+y, size+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(-(size)+x, size+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
+		if (x >= 0) {
+			if (x != Chunk.COLUMNS - 1 && (x == 0) || (blocks[x - 1][y][z] != 1)){
+				// bottom left
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(-(size)+realX, size+y, size+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(-(size)+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+			}
+		}
 		
 		// TOP FACE
-		
-		// bottom left
-		quadTesselator.addVertex(-(size)+x, size+y, size+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(size+x, size+y, size+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(size+x, size+y, -(size)+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(-(size)+x, size+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
+		if(y < HEIGHT){
+			// If we're the top block, or there's no visible block above
+			if ( (y == HEIGHT - 1) || (blocks[x][y + 1][z] != 1) ){
+				// bottom left
+				quadTesselator.addVertex(-(size)+realX, size+y, size+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(size+realX, size+y, size+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(size+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(-(size)+realX, size+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+			}
+		}
 		
 		// BOTTOM FACE
-		
-		// bottom left
-		quadTesselator.addVertex(size+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 0);
-		quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
-		
-		// bottom right
-		quadTesselator.addVertex(size+x, -(size)+y, size+z);
-		quadTesselator.addColor(0, 1, 0);
-		quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
-		
-		// top right
-		quadTesselator.addVertex(-(size)+x, -(size)+y, size+z);
-		quadTesselator.addColor(0, 0, 1);
-		quadTesselator.addTextureCoord(topRightX,topRightY);
-		
-		// top left
-		quadTesselator.addVertex(-(size)+x, -(size)+y, -(size)+z);
-		quadTesselator.addColor(1, 0, 1);
-		quadTesselator.addTextureCoord(topLeftX,topLeftY);
-		
+		if (y >= 0) {
+			if (y != HEIGHT - 1 && (y == 0) || (blocks[x][y - 1][z] != 1)){
+				// bottom left
+				quadTesselator.addVertex(size+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 0);
+				quadTesselator.addTextureCoord(bottomLeftX,bottomLeftY);
+				
+				// bottom right
+				quadTesselator.addVertex(size+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(0, 1, 0);
+				quadTesselator.addTextureCoord(bottomRightX,bottomRightY);
+				
+				// top right
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, size+realZ);
+				quadTesselator.addColor(0, 0, 1);
+				quadTesselator.addTextureCoord(topRightX,topRightY);
+				
+				// top left
+				quadTesselator.addVertex(-(size)+realX, -(size)+y, -(size)+realZ);
+				quadTesselator.addColor(1, 0, 1);
+				quadTesselator.addTextureCoord(topLeftX,topLeftY);
+			}
+		}
 	}
 }
