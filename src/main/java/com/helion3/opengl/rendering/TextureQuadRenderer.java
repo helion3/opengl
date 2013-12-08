@@ -1,5 +1,6 @@
 package com.helion3.opengl.rendering;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -15,6 +16,9 @@ public class TextureQuadRenderer {
 	private IntBuffer ib = BufferUtils.createIntBuffer(1);
     protected int vertexCount = 0;
     protected int bufferId = -1;
+    
+    protected ByteBuffer byteBuffer = ByteBuffer.allocate(1);
+    
     
     
     /**
@@ -109,6 +113,9 @@ public class TextureQuadRenderer {
     }
     
     
+    /**
+     * 
+     */
     public void destroy(){
     	ib.put(0, bufferId);
         glDeleteBuffersARB(ib);

@@ -12,32 +12,29 @@ public class Chunk {
 	private int bufferSize = 192 * ROWS * COLUMNS * HEIGHT; // 192 per block * chunk dimensions
 	private TextureQuadRenderer quadTesselator = new TextureQuadRenderer(bufferSize);
 	
-	
-	/**
-	 * 
-	 * @param chunkX
-	 * @param chunkZ
-	 */
-	public Chunk( int chunkX, int chunkZ ){
-		// Draw intial list of blocks, and cache it
-		prerender(chunkX,chunkZ);
-	}
-	
 
 	/**
 	 * Build the tileset for this chunk
 	 * @param chunkX
 	 * @param chunkZ
 	 */
-	public void prerender( int chunkX, int chunkZ ){
+	public int prerender( int chunkX, int chunkZ ){
+		int blocksRendered = 0;
 		for( int x = 0; x < ROWS; x++ ){
 			for( int z = 0; z < COLUMNS; z++ ){
 				for( int y = 0; y < HEIGHT; y++ ){
-					prerenderBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
+					
+					// Only render blocks on the edges
+					// Simulating checking of block exposed to air
+					if( x == 0 || z == 0 || y == 0 || x == (ROWS-1) || y == (HEIGHT-1) || z == (COLUMNS-1) ){
+						blocksRendered++;
+						prerenderBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
+					}
 				}
 			}
 		}
 		quadTesselator.saveToBuffer();
+		return blocksRendered;
 	}
 	
 	
