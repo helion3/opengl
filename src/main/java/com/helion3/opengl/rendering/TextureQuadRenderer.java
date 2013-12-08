@@ -78,6 +78,7 @@ public class TextureQuadRenderer {
     	interleavedBuffer.rewind();
     	glBindBufferARB(GL_ARRAY_BUFFER_ARB, bufferId);
         glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
+        interleavedBuffer = null;
     }
 
     
@@ -111,14 +112,5 @@ public class TextureQuadRenderer {
     public void destroy(){
     	ib.put(0, bufferId);
         glDeleteBuffersARB(ib);
-    }
-    
-    
-    /**
-     * 
-     */
-    protected void clear(){
-    	vertexCount = 0;
-    	interleavedBuffer.clear();
     }
 }
