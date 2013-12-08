@@ -238,8 +238,26 @@ public class Game {
 		
 		world.render();
 		
+		// Show fake cursor
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glLoadIdentity();
+		UserInterface.enterOrtho();
+		glColor3f(1f,1f,1f);
+		UserInterface.drawString( Fonts.arialPlain.get(), "+", (Display.getWidth()/2), (Display.getHeight()/2), org.newdawn.slick.Color.white);
+		
+    	String d = "";
+        d += "Coord: x:" + (int)camera.getPos().getX() + " y:" + (int)camera.getPos().getY() + " z:" + (int)camera.getPos().getZ();
+        d += " Chks: " + world.getLoadedChunks().size();
+
+        int lineHeight = Fonts.arialPlain.get().getHeight(d);
+        int y = Display.getHeight() - lineHeight;
+//        UserInterface.fillRect(2, y-3, UserInterface.getLineWidth(Fonts.arialPlain.get(), d)+20, (lineHeight)+6, new java.awt.Color(64, 64, 64));
+        UserInterface.drawString( Fonts.arialPlain.get(), d, 5, y, org.newdawn.slick.Color.white );
+		
+        UserInterface.leaveOrtho();
+		
 	}
-	
+
 
 	
 	

@@ -12,6 +12,15 @@ public class Camera {
 	
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public Vector3f getPos(){
+		return position;
+	}
+	
+	
+	/**
 	 * Returns the current yaw
 	 * @return
 	 */

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class World {
 	
-	List<Chunk> loadedChunks = new ArrayList<Chunk>();
+	private List<Chunk> loadedChunks = new ArrayList<Chunk>();
 	
 	
 	/**
@@ -14,14 +14,23 @@ public class World {
 	public World(){
 		int blocksRendered = 0;
 		// Build all of the initial chunks
-		for( int x = 1; x < 20; x++ ){
-			for( int z = 1; z < 20; z++ ){
+		for( int x = 1; x < 10; x++ ){
+			for( int z = 1; z < 10; z++ ){
 				Chunk c = new Chunk();
 				blocksRendered += c.prerender(x, z);
 				loadedChunks.add( c );
 			}
 		}
 		System.out.println("Blocks rendering: " + blocksRendered);
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Chunk> getLoadedChunks(){
+		return loadedChunks;
 	}
 	
 	

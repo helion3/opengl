@@ -24,8 +24,8 @@ public class Chunk {
 			for( int z = 0; z < COLUMNS; z++ ){
 				for( int y = 0; y < HEIGHT; y++ ){
 					
-					// Only render blocks on the edges
-					// Simulating checking of block exposed to air
+					// Only render blocks on the edges, saves a bit of work in checking neighbor blocks
+					// in a real app with random terrain, this won't cut it.
 					if( x == 0 || z == 0 || y == 0 || x == (ROWS-1) || y == (HEIGHT-1) || z == (COLUMNS-1) ){
 						blocksRendered++;
 						prerenderBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
