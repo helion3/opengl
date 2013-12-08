@@ -1,0 +1,8 @@
+This rendering experiment application is open source for the benefit of those 
+who might learn from my research and performance tuning.
+
+Learning opengl and getting VBOs to work well for large block games is hard.
+
+This code licensed under the GNU General Public License, version 3 (GPL-3.0)
+
+http://opensource.org/licenses/GPL-3.0
