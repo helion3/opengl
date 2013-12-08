@@ -1,15 +1,5 @@
 package com.helion3.opengl.shapes;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-
-import org.newdawn.slick.opengl.Texture;
-
 import com.helion3.opengl.rendering.TextureQuadRenderer;
 
 
@@ -19,35 +9,43 @@ public class Chunk {
 	public static final int COLUMNS = 16;
 	public static final int HEIGHT = 16;
 	
-	private static int bufferSize = 192 * ROWS * COLUMNS * HEIGHT; // 192 per block * chunk dimensions
-	private static TextureQuadRenderer quadTesselator = new TextureQuadRenderer(bufferSize);
-
+	private int bufferSize = 192 * ROWS * COLUMNS * HEIGHT; // 192 per block * chunk dimensions
+	private TextureQuadRenderer quadTesselator = new TextureQuadRenderer(bufferSize);
+	
+	
 	/**
 	 * 
-	 * @param quadTesselator
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param chunkX
+	 * @param chunkZ
 	 */
-	public static void draw( Texture texture, int chunkX, int chunkZ ){
-		
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		
-		texture.bind();
-		glActiveTexture(GL_TEXTURE0 + 0);
-		
+	public Chunk( int chunkX, int chunkZ ){
+		// Draw intial list of blocks, and cache it
+		prerender(chunkX,chunkZ);
+	}
+	
+
+	/**
+	 * Build the tileset for this chunk
+	 * @param chunkX
+	 * @param chunkZ
+	 */
+	public void prerender( int chunkX, int chunkZ ){
 		for( int x = 0; x < ROWS; x++ ){
 			for( int z = 0; z < COLUMNS; z++ ){
 				for( int y = 0; y < HEIGHT; y++ ){
-					drawBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
+					prerenderBlock( (chunkX*ROWS)+x, y, (chunkZ*COLUMNS)+z );
 				}
 			}
 		}
-		
+		quadTesselator.saveToBuffer();
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public void render(){
 		quadTesselator.render();
-		
 	}
 	
 	
@@ -58,7 +56,7 @@ public class Chunk {
 	 * @param y
 	 * @param z
 	 */
-	protected static void drawBlock( int x, int y, int z ){
+	protected void prerenderBlock( int x, int y, int z ){
 		
 		float size = 0.5f;
 		

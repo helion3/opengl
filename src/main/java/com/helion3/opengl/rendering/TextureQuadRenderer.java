@@ -14,6 +14,7 @@ public class TextureQuadRenderer {
 	private FloatBuffer interleavedBuffer;
 	private IntBuffer ib = BufferUtils.createIntBuffer(1);
     protected int vertexCount = 0;
+    protected int bufferId = -1;
     
     
     /**
@@ -22,6 +23,17 @@ public class TextureQuadRenderer {
      */
     public TextureQuadRenderer( int bufferSize ){
     	this.interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
+    	glGenBuffersARB(ib);
+    	bufferId = ib.get(0);
+    }
+    
+    
+    /**
+     * 
+     * @return
+     */
+    public int getBufferId(){
+    	return bufferId;
     }
     
     
@@ -57,6 +69,16 @@ public class TextureQuadRenderer {
     public void addTextureCoord( float x, float y ){
     	interleavedBuffer.put(x).put(y);
     }
+    
+    
+    /**
+     * 
+     */
+    public void saveToBuffer(){
+    	interleavedBuffer.rewind();
+    	glBindBufferARB(GL_ARRAY_BUFFER_ARB, bufferId);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
+    }
 
     
     /**
@@ -65,17 +87,11 @@ public class TextureQuadRenderer {
      */
     public void render(){
     	
-    	interleavedBuffer.flip();
-
-    	glGenBuffersARB(ib);
-    	int vHandle = ib.get(0);
-        
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vHandle);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, interleavedBuffer, GL_STATIC_DRAW_ARB);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, bufferId);
         
         glVertexPointer(3, GL_FLOAT, 32, 0);
         glColorPointer(3, GL_FLOAT, 32, 12);
@@ -88,12 +104,13 @@ public class TextureQuadRenderer {
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-        ib.put(0, vHandle);
-        glDeleteBuffersARB(ib);
         
-        clear();
-    	
+    }
+    
+    
+    public void destroy(){
+    	ib.put(0, bufferId);
+        glDeleteBuffersARB(ib);
     }
     
     

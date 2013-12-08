@@ -1,6 +1,8 @@
 package com.helion3.opengl;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 import java.io.IOException;
 
@@ -51,6 +53,7 @@ public class Game {
 	private Camera camera = new Camera();
 	private Texture texture;
 	private float mouseSensitivity = 0.1f;
+	private World world;
 	
 	    	
 	/**
@@ -83,6 +86,8 @@ public class Game {
         initGL();
         getDelta();
         lastFPS = getTime();
+        
+        world = new World();
 
         // Begin loop
         displayLoop();
@@ -224,12 +229,15 @@ public class Game {
 //		TextureSquare.draw( texture, 20, 1, 20 );
 //		TextureCube.draw( texture, 20, 1, 20 );
 		
-		// Draw several chunks of blocks
-		for( int x = 1; x < 10; x++ ){
-			for( int z = 1; z < 10; z++ ){
-				Chunk.draw(texture, x, z);
-			}
-		}
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		
+		texture.bind();
+		glActiveTexture(GL_TEXTURE0 + 0);
+		
+		world.render();
+		
 	}
 	
 
